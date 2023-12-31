@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Core
 {
-    internal class DungeonMap : Map
+    public class DungeonMap : Map
     {
+        public List<Rectangle> Rooms;
+
+        public DungeonMap() { 
+            Rooms = new List<Rectangle>();
+        }
+
         public void Draw(RLConsole mapConsole)
         {
             mapConsole.Clear();
@@ -20,6 +26,54 @@ namespace Roguelike.Core
             }
         }
 
+        public void UpdateFov()
+        {
+            Player player = Game.Player;
+
+            // Compute the field-of-view based on the player's location and awareness
+            ComputeFov(player.X, player.Y, player.Awareness, true);
+            // Mark all cells in field-of-view as having been explored
+            foreach (Cell cell in GetAllCells())
+            {
+                if (IsInFov(cell.X, cell.Y))
+                {
+                    SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
+                }
+            }
+        }
+
+        // Return true if successfully set actor new position, false otherwise
+        public bool SetActorPosition(Actor actor, int x, int y)
+        {
+            // Only allow actor placement if cell is walkable
+            if (GetCell(x,y).IsWalkable)
+            {
+                // Set cell actor was previously on to be walkable
+                SetIsWalkable(actor.X, actor.Y, true);
+
+                actor.X = x;
+                actor.Y = y;
+
+                // Set cell actor that is currently on to be unwalkable
+                SetIsWalkable(actor.X, actor.Y, false);
+
+                if (actor is Player)
+                {
+                    UpdateFov();
+                }
+                return true;
+
+            }
+            return false;
+        }
+
+        public void SetIsWalkable(int x, int y,  bool isWalkable)
+        {
+            Cell cell = (Cell) GetCell(x,y);
+            SetCellProperties(cell.X, cell.Y, cell.IsTransparent, isWalkable, cell.IsExplored);
+        }
+
+        // 
         private void SetConsoleSymbolForCell(RLConsole mapConsole, Cell cell)
         {
             // When a cell is not explored, do nothing

@@ -41,6 +41,7 @@ namespace Roguelike
         public static Player Player { get; set; }
 
         public static IRandom Random { get; private set; }
+        public static MessageLog MessageLog { get; private set; }
 
         public static void Main()
         {
@@ -48,6 +49,10 @@ namespace Roguelike
             Random = new DotNetRandom(seed);
 
             CommandSystem = new CommandSystem();
+
+            MessageLog = new MessageLog();
+            MessageLog.AddLine("The rogue arrives on level 1");
+            MessageLog.AddLine($"Level created with seed '{seed}'");
 
             MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 14, 7);
             DungeonMap = mapGenerator.CreateMap();
@@ -75,8 +80,6 @@ namespace Roguelike
             // Begin RLNET's game loop
 
             // Set background color and text for each console
-            _messageConsole.SetBackColor(0, 0, _messageWidth, _messageHeight, Pallete.DbDeepWater);
-            _messageConsole.Print(1, 1, "Message", RLColor.White);
 
             _statConsole.SetBackColor(0, 0, _statWidth, _statHeight, Pallete.DbOldStone);
             _statConsole.Print(1, 1, "Stats", RLColor.White);
@@ -130,7 +133,8 @@ namespace Roguelike
             {
                 DungeonMap.Draw(_mapConsole);
                 Player.Draw(_mapConsole, DungeonMap);
-
+                Player.DrawStats(_statConsole);
+                MessageLog.DrawLog(_messageConsole);
                 // Blit the subconsoles to the root console
                 RLConsole.Blit(_mapConsole, 0, 0, _mapWidth, _mapHeight, _rootConsole, 0, _inventoryHeight);
                 RLConsole.Blit(_statConsole, 0, 0, _statWidth, _statHeight, _rootConsole, _mapWidth, 0);

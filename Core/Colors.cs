@@ -22,5 +22,7 @@ namespace Roguelike.Core
         public static RLColor TextHeading = Pallete.DbLight;
 
         public static RLColor Player = Pallete.DbLight;
+        public static RLColor Text = Pallete.DbLight;
+        public static RLColor Gold = Pallete.DbSun;
     }
 }

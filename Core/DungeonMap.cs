@@ -26,6 +26,13 @@ namespace Roguelike.Core
             }
         }
 
+        public void AddPlayer(Player player)
+        {
+            Game.Player = player;
+            SetIsWalkable(player.X, player.Y, false);
+            UpdateFov();
+        }
+
         public void UpdateFov()
         {
             Player player = Game.Player;

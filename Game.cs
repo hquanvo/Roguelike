@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using Roguelike.Core;
 using Roguelike.System;
+using RogueSharp.Random;
 
 namespace Roguelike
 {
@@ -37,14 +38,18 @@ namespace Roguelike
 
         public static DungeonMap DungeonMap { get; private set; }
 
-        public static Player Player { get; private set; }
+        public static Player Player { get; set; }
+
+        public static IRandom Random { get; private set; }
 
         public static void Main()
         {
-            Player = new Player();
+            int seed = (int) DateTime.UtcNow.Ticks;
+            Random = new DotNetRandom(seed);
+
             CommandSystem = new CommandSystem();
 
-            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight);
+            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 14, 7);
             DungeonMap = mapGenerator.CreateMap();
 
             DungeonMap.UpdateFov();
@@ -52,7 +57,7 @@ namespace Roguelike
             // This must be the exact name of the bitmap font file we are using or it will error.
             string fontFileName = "terminal8x8.png";
             // The title will appear at the top of the console window
-            string consoleTitle = "Roguelike";
+            string consoleTitle = $"Roguelike - Seed {seed}";
             // Tell RLNet to use the bitmap font that we specified and that each tile is 8 x 8 pixels
             _rootConsole = new RLRootConsole(fontFileName, _screenWidth, _screenHeight,
               8, 8, 1f, consoleTitle);

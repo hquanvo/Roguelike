@@ -13,8 +13,8 @@ namespace Roguelike.Core
         private int _nextExp;
         public Player() 
         {
-            Attack = 5;
-            Defense = 2;
+            Attack = 15;
+            Defense = 8;
             Gold = 0;
             Health = 100;
             MaxHealth = 100;
@@ -36,6 +36,18 @@ namespace Roguelike.Core
             statConsole.Print(1, 9, $"Speed:   {Speed}", Colors.Text);
             statConsole.Print(1, 11, $"Exp:     {_exp}/{_nextExp}", Colors.Exp);
             statConsole.Print(1, 13, $"Gold:    {Gold}", Colors.Gold);
+        }
+
+        public int Exp
+        {
+            get { return _exp; }
+            set { _exp = value; }
+        }
+
+        public int NextExp
+        {
+            get { return _nextExp; }
+            set { _nextExp = value; }
         }
     }
 }

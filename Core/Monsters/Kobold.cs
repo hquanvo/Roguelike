@@ -19,11 +19,12 @@ namespace Roguelike.Core.Monsters
                 Gold = 20 + Dice.Roll("1D10"),
                 Color = Colors.KoboldColor,
                 Health = 30 + level / 2,
-                MaxHealth = 30 + level/2,
+                MaxHealth = 30 + level / 2,
                 Name = "Kobold",
-                Speed = 3,
+                Speed = 30,
                 Symbol = 'k',
                 Awareness = 10,
+                ExpValue = 10
             };
         }
     }

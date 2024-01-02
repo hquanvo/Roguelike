@@ -10,7 +10,7 @@ namespace Roguelike.Interfaces
     public interface IActor
     {   
         // Combat: Damage formula is Attack - Defense (with 5% dmg variation). Speed determines hit chance.
-        // If attacker speed >= 2 * defender speed, hit chance is 150%, if attacker speed <= defender speed / 2, hit chance is 50%.
+        // If attacker speed >= 1.5 * defender speed, hit chance is 150%, if attacker speed <= defender speed / 2, hit chance is 50%.
         int Attack { get; set; }
         int Defense { get; set; }
         int Gold { get; set; }

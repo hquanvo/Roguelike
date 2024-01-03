@@ -20,7 +20,6 @@ namespace Roguelike.System
         public void AddLine(string msg)
         {
             _lines.Enqueue(msg);
-
             if (_lines.Count > _maxLines) _lines.Dequeue();
         }
 

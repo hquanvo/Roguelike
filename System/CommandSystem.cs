@@ -106,6 +106,11 @@ namespace Roguelike.System
                 Game.MessageLog.AddLine($"  {monster.Name} died and dropped {monster.Gold} gold");
                 Game.MessageLog.AddLine($"Gained {monster.ExpValue} Exp!");
                 player.Exp = player.Exp + monster.ExpValue;
+                if (player.Exp >= player.NextExp)
+                {
+                    player.LevelUp();
+                    Game.MessageLog.AddLine("Level up!");
+                }
             }
         }
 

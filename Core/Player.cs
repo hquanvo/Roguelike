@@ -49,5 +49,16 @@ namespace Roguelike.Core
             get { return _nextExp; }
             set { _nextExp = value; }
         }
+
+        public void LevelUp()
+        {
+            Attack = (int) (Attack * 1.2) + 2;
+            Defense = (int) (Defense * 1.2) + 1;
+            Health = (int) (Health * 1.5);
+            MaxHealth = (int) (MaxHealth * 1.5);
+            Speed = (int) (Speed * 1.15);
+            Exp = Exp - NextExp;
+            NextExp = (int)(NextExp * 1.3);
+        }
     }
 }

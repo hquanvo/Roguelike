@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Core
 {
-    public class Actor : IActor, IDrawable
+    public class Actor : IActor, IDrawable, IScheduleable
     {
         private int _attack;
         private int _defense;
@@ -19,6 +19,7 @@ namespace Roguelike.Core
         private int _speed;
         private string _name;
         private int _awareness;
+        private int _remainder;
 
         public int Attack
         {
@@ -86,6 +87,7 @@ namespace Roguelike.Core
         public char Symbol { get ; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int Remainder { get { return _remainder; } set { _remainder = value; } }
 
         public void Draw(RLConsole console, IMap map)
         {

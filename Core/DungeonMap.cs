@@ -12,9 +12,14 @@ namespace Roguelike.Core
     {
         public List<Rectangle> Rooms;
         private readonly List<Monster> _monsters;
-        public DungeonMap() { 
+        public List<Door> Doors { get; set; }
+        public Stairs StairsUp { get; set; }
+        public Stairs StairsDown { get; set; }
+        public DungeonMap() {
+            Game.SchedulingSystem.Clear();
             Rooms = new List<Rectangle>();
             _monsters = new List<Monster>();
+            Doors = new List<Door>();
         }
 
         public void Draw(RLConsole mapConsole, RLConsole statConsole)
@@ -44,6 +49,13 @@ namespace Roguelike.Core
             {
                 monster.Draw(mapConsole, this);
             }
+            foreach (Door door in Doors)
+            {
+                door.Draw(mapConsole, this);
+            }
+
+            StairsUp.Draw(mapConsole, this);
+            StairsDown.Draw(mapConsole, this);
         }
 
         public void AddPlayer(Player player)
@@ -51,6 +63,7 @@ namespace Roguelike.Core
             Game.Player = player;
             SetIsWalkable(player.X, player.Y, false);
             UpdateFov();
+            Game.SchedulingSystem.Add(player);
         }
 
         public void UpdateFov()
@@ -77,7 +90,7 @@ namespace Roguelike.Core
             {
                 // Set cell actor was previously on to be walkable
                 SetIsWalkable(actor.X, actor.Y, true);
-
+                OpenDoor(actor, x, y);
                 actor.X = x;
                 actor.Y = y;
 
@@ -139,12 +152,14 @@ namespace Roguelike.Core
             _monsters.Add(monster);
             // After adding the monster to the map make sure to make the cell not walkable
             SetIsWalkable(monster.X, monster.Y, false);
+            Game.SchedulingSystem.Add(monster);
         }
 
         public void RemoveMonster(Monster monster)
         {
             _monsters.Remove(monster);
             SetIsWalkable(monster.X, monster.Y, true);
+            Game.SchedulingSystem.Remove(monster);
         }
 
         public Monster GetMonsterAt(int x, int y)
@@ -186,6 +201,31 @@ namespace Roguelike.Core
                 }
             }
             return false;
-        }   
+        }
+
+        public Door GetDoor(int x, int y)
+        {
+            return Doors.SingleOrDefault(d => d.X == x && d.Y == y);
+        }
+
+        // The actor opens the door located at the x,y position
+        private void OpenDoor(Actor actor, int x, int y)
+        {
+            Door door = GetDoor(x, y);
+            if (door != null && !door.IsOpen)
+            {
+                door.IsOpen = true;
+                var cell = GetCell(x, y);
+                // Once the door is opened it should be marked as transparent and no longer block field-of-view
+                SetCellProperties(x, y, true, cell.IsWalkable, cell.IsExplored);
+
+                Game.MessageLog.AddLine($"{actor.Name} opened a door");
+            }
+        }
+        public bool CanMoveDownToNextLevel()
+        {
+            Player player = Game.Player;
+            return StairsDown.X == player.X && StairsDown.Y == player.Y;
+        }
     }
 }

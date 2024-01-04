@@ -1,4 +1,6 @@
 ﻿using RLNET;
+using Roguelike.Core.Behavior;
+using Roguelike.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ namespace Roguelike.Core
 {
     public class Monster : Actor
     {
+        public int? TurnsAlerted {  get; set; }
         protected int _expValue;
         public void DrawStats(RLConsole statConsole, int position)
         {
@@ -30,5 +33,10 @@ namespace Roguelike.Core
             set { _expValue = value; }
         }
 
+        public virtual void PerformAction(CommandSystem commandSystem)
+        {
+            var behavior = new StandardMoveAndAttack();
+            behavior.Act(this, commandSystem);
+        }
     }
 }

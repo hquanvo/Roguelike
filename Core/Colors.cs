@@ -27,5 +27,11 @@ namespace Roguelike.Core
         public static RLColor Exp = Pallete.DbSky;
 
         public static RLColor KoboldColor = Pallete.DbBlood;
+
+        public static RLColor DoorBackground = Pallete.ComplimentDarkest;
+        public static RLColor Door = Pallete.ComplimentLighter;
+        public static RLColor DoorBackgroundFov = Pallete.ComplimentDarker;
+        public static RLColor DoorFov = Pallete.ComplimentLightest;
+
     }
 }

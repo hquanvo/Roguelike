@@ -9,6 +9,7 @@ namespace Roguelike
     {
         private static bool _renderRequired = true;
         public static CommandSystem CommandSystem { get; private set; }
+        public static SchedulingSystem SchedulingSystem { get; private set; }
 
         // The screen height and width are in number of tiles
         private static readonly int _screenWidth = 100;
@@ -42,6 +43,7 @@ namespace Roguelike
 
         public static IRandom Random { get; private set; }
         public static MessageLog MessageLog { get; private set; }
+        private static int _mapLevel = 1;
 
         public static void Main()
         {
@@ -49,12 +51,13 @@ namespace Roguelike
             Random = new DotNetRandom(seed);
 
             CommandSystem = new CommandSystem();
+            SchedulingSystem = new SchedulingSystem();
 
             MessageLog = new MessageLog();
-            MessageLog.AddLine("The rogue arrives on level 1");
+            MessageLog.AddLine($"The rogue arrives on level {_mapLevel}");
             MessageLog.AddLine($"Level created with seed '{seed}'");
 
-            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 14, 7);
+            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 14, 7, _mapLevel);
             DungeonMap = mapGenerator.CreateMap();
 
             DungeonMap.UpdateFov();
@@ -96,32 +99,53 @@ namespace Roguelike
             bool didPlayerAct = false;
             RLKeyPress keyPress = _rootConsole.Keyboard.GetKeyPress();
 
-            if (keyPress != null) 
+            if (CommandSystem.IsPlayerTurn)
             {
-                if (keyPress.Key == RLKey.Up)
+                if (keyPress != null)
                 {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                    if (keyPress.Key == RLKey.Up)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Up);
+                    }
+                    else if (keyPress.Key == RLKey.Down)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
+                    }
+                    else if (keyPress.Key == RLKey.Left)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
+                    }
+                    else if (keyPress.Key == RLKey.Right)
+                    {
+                        didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
+                    }
+                    else if (keyPress.Key == RLKey.Escape)
+                    {
+                        _rootConsole.Close();
+                    }
+                    else if (keyPress.Key == RLKey.Period)
+                    {
+                        if (DungeonMap.CanMoveDownToNextLevel())
+                        {
+                            MapGenerator mapGenerator = new MapGenerator(_mapWidth, _mapHeight, 20, 13, 7, ++_mapLevel);
+                            DungeonMap = mapGenerator.CreateMap();
+                            MessageLog = new MessageLog();
+                            CommandSystem = new CommandSystem();
+                            _rootConsole.Title = $"RougeSharp RLNet Tutorial - Level {_mapLevel}";
+                            didPlayerAct = true;
+                        }
+                    }
                 }
-                else if (keyPress.Key == RLKey.Down)
+
+                if (didPlayerAct)
                 {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Down);
-                }
-                else if (keyPress.Key == RLKey.Left)
-                {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Left);
-                }
-                else if (keyPress.Key == RLKey.Right)
-                {
-                    didPlayerAct = CommandSystem.MovePlayer(Direction.Right);
-                }
-                else if (keyPress.Key == RLKey.Escape)
-                {
-                    _rootConsole.Close();
+                    _renderRequired = true;
+                    CommandSystem.EndPlayerTurn();
                 }
             }
-
-            if (didPlayerAct)
+            else
             {
+                CommandSystem.ActivateMonsters();
                 _renderRequired = true;
             }
         }
